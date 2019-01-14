@@ -41,7 +41,10 @@ public class AppInfo implements Comparable<AppInfo> {
     public int compareTo(AppInfo o) {
         ArrayList<String> aAutoAppsList = new ArrayList<>();
         aAutoAppsList.add("com.github.slashmax.aamirror");
+        aAutoAppsList.add("com.github.slashmax.aamirror_plus");
         aAutoAppsList.add("com.google.android.kk");
+        aAutoAppsList.add("com.mqbcoding.stats");
+        aAutoAppsList.add("org.openauto.aautolauncher");
         int comp1;
         int comp2;
         int result;

@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     String path = getApplicationInfo().dataDir;
+                    boolean suitableMethodFound = true;
                     copyAssets();
 
                     appendText(logs, "\n\n-- Drop Triggers  --");
@@ -153,7 +154,11 @@ public class MainActivity extends AppCompatActivity {
                         ).getStreamLogsWithLabels());
 
                         appendText(logs, "\n--  end SQL method #1  --");
-                    } else {
+
+                    } else if (runSuWithCmd(
+                            path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                    "'SELECT 1 FROM Packages WHERE packageName=\"com.google.android.gms.car\"'").getInputStreamLog().trim().equals("1")) {
+
                         appendText(logs, "\n\n--  run SQL method #2  --");
                         appendText(logs, runSuWithCmd(
                                 path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
@@ -185,57 +190,113 @@ public class MainActivity extends AppCompatActivity {
                                         "END;'"
                         ).getStreamLogsWithLabels());
                         appendText(logs, "\n--  end SQL method #2  --");
-                    }
 
-                    StreamLogs checkStep1 = runSuWithCmd(
+                    } else if (runSuWithCmd(
                             path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'SELECT * FROM Flags WHERE name=\"app_white_list\";'"
-                    );
-                    String[] checkStep1Sorted = checkStep1.getInputStreamLog().split("\n");
-                    Arrays.sort(checkStep1Sorted);
+                                    "'SELECT 1 FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car#car\"'").getInputStreamLog().trim().equals("1")) {
 
-                    String checkStep1SortedToString = "";
-                    for (String s : checkStep1Sorted) {
-                        checkStep1SortedToString += "\n" + s;
-                    }
-                    checkStep1SortedToString.replaceFirst("\n", "");
-                    checkStep1.setInputStreamLog(checkStep1SortedToString);
+                        appendText(logs, "\n\n--  run SQL method #3  --");
+                        appendText(logs, runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car#car\", 240, 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car#car\", (SELECT version FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car#car\"), 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", 240, 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", (SELECT version FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"), 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);'"
+                        ).getStreamLogsWithLabels());
 
-                    appendText(logs, "\n\n--  Check (1/3)  --" + checkStep1.getStreamLogsWithLabels());
+                        appendText(logs, runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'CREATE TRIGGER after_delete AFTER DELETE\n" +
+                                        "ON Flags\n" +
+                                        "BEGIN\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car#car\", 240, 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car#car\", (SELECT version FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car#car\"), 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", 240, 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", (SELECT version FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"), 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "END;'"
+                        ).getStreamLogsWithLabels());
+                        appendText(logs, "\n--  end SQL method #3  --");
 
-                    appendText(logs, "\n--  Check (2/3)  --" + runSuWithCmd(
+                    } else if (runSuWithCmd(
                             path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'DELETE FROM Flags WHERE name=\"app_white_list\";'"
-                    ).getStreamLogsWithLabels());
+                                    "'SELECT 1 FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"'").getInputStreamLog().trim().equals("1")) {
 
-                    StreamLogs checkStep3 = runSuWithCmd(
-                            path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'SELECT * FROM Flags WHERE name=\"app_white_list\";'"
-                    );
-                    String[] checkStep3Sorted = checkStep3.getInputStreamLog().split("\n");
-                    Arrays.sort(checkStep3Sorted);
+                        appendText(logs, "\n\n--  run SQL method #4  --");
+                        appendText(logs, runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", 240, 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", (SELECT version FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"), 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);'"
+                        ).getStreamLogsWithLabels());
 
-                    String checkStep3SortedToString = "";
-                    for (String s : checkStep3Sorted) {
-                        checkStep3SortedToString += "\n" + s;
-                    }
-                    checkStep3SortedToString.replaceFirst("\n", "");
-                    checkStep3.setInputStreamLog(checkStep3SortedToString);
+                        appendText(logs, runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'CREATE TRIGGER after_delete AFTER DELETE\n" +
+                                        "ON Flags\n" +
+                                        "BEGIN\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", 240, 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "INSERT OR REPLACE INTO Flags (packageName, version, flagType, partitionId, user, name, stringVal, committed) VALUES (\"com.google.android.gms.car\", (SELECT version FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"), 0, 0, \"\", \"app_white_list\", \"" + whiteListStringFinal + "\",1);\n" +
+                                        "END;'"
+                        ).getStreamLogsWithLabels());
+                        appendText(logs, "\n--  end SQL method #4  --");
 
-                    appendText(logs, "\n--  Check (3/3)  --" + checkStep3.getStreamLogsWithLabels());
-
-                    if (checkStep1.getInputStreamLog().length() == checkStep3.getInputStreamLog().length()) {
-                        appendText(logs, "\n\n--  Check seems OK :)  --");
-
-                        DialogFragment newFragment = new RebootDialog();
-                        newFragment.show(getSupportFragmentManager(), "reboot");
                     } else {
-                        appendText(logs, "\n\n--  Check NOT OK.  --");
-                        appendText(logs, "\n     Length before delete and after was not equal.");
-                        appendText(logs, "\n        Before: " + checkStep1.getInputStreamLog().length());
-                        appendText(logs, "\n        After:  " + checkStep3.getInputStreamLog().length());
+                        suitableMethodFound = false;
+                        appendText(logs, "\n\n--  Suitable method NOT found!  --");
                     }
-            }
+
+                    // Check Start
+                    if (suitableMethodFound) {
+                        StreamLogs checkStep1 = runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'SELECT * FROM Flags WHERE name=\"app_white_list\";'"
+                        );
+                        String[] checkStep1Sorted = checkStep1.getInputStreamLog().split("\n");
+                        Arrays.sort(checkStep1Sorted);
+
+                        String checkStep1SortedToString = "";
+                        for (String s : checkStep1Sorted) {
+                            checkStep1SortedToString += "\n" + s;
+                        }
+                        checkStep1SortedToString.replaceFirst("\n", "");
+                        checkStep1.setInputStreamLog(checkStep1SortedToString);
+
+                        appendText(logs, "\n\n--  Check (1/3)  --" + checkStep1.getStreamLogsWithLabels());
+
+                        appendText(logs, "\n--  Check (2/3)  --" + runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'DELETE FROM Flags WHERE name=\"app_white_list\";'"
+                        ).getStreamLogsWithLabels());
+
+                        StreamLogs checkStep3 = runSuWithCmd(
+                                path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
+                                        "'SELECT * FROM Flags WHERE name=\"app_white_list\";'"
+                        );
+                        String[] checkStep3Sorted = checkStep3.getInputStreamLog().split("\n");
+                        Arrays.sort(checkStep3Sorted);
+
+                        String checkStep3SortedToString = "";
+                        for (String s : checkStep3Sorted) {
+                            checkStep3SortedToString += "\n" + s;
+                        }
+                        checkStep3SortedToString.replaceFirst("\n", "");
+                        checkStep3.setInputStreamLog(checkStep3SortedToString);
+
+                        appendText(logs, "\n--  Check (3/3)  --" + checkStep3.getStreamLogsWithLabels());
+
+                        if (checkStep1.getInputStreamLog().length() == checkStep3.getInputStreamLog().length()) {
+                            appendText(logs, "\n\n--  Check seems OK :)  --");
+
+                            DialogFragment newFragment = new RebootDialog();
+                            newFragment.show(getSupportFragmentManager(), "reboot");
+                        } else {
+                            appendText(logs, "\n\n--  Check NOT OK.  --");
+                            appendText(logs, "\n     Length before delete and after was not equal.");
+                            appendText(logs, "\n        Before: " + checkStep1.getInputStreamLog().length());
+                            appendText(logs, "\n        After:  " + checkStep3.getInputStreamLog().length());
+                        }
+                    }
+                    // Check End
+                }
             }.start();
         }
     }
