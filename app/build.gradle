@@ -6,8 +6,8 @@ android {
         applicationId "pl.eselter.aaphenotypepatcher"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 8
-        versionName "0.8"
+        versionCode 9
+        versionName "0.85"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -9,15 +9,24 @@ public class StreamLogs {
     }
 
     public String getInputStreamLog() {
-        return inputStreamLog.trim();
+        if (inputStreamLog == null)
+            return "";
+        else
+            return inputStreamLog.trim();
     }
 
     public String getErrorStreamLog() {
-        return errorStreamLog.trim();
+        if (errorStreamLog == null)
+            return "";
+        else
+            return errorStreamLog.trim();
     }
 
     public String getOutputStreamLog() {
-        return outputStreamLog.trim();
+        if (outputStreamLog == null)
+            return "";
+        else
+            return outputStreamLog.trim();
     }
 
     public void setInputStreamLog(String inputStreamLog) {

@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (runSuWithCmd(
                             path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'SELECT 1 FROM Packages WHERE packageName=\"com.google.android.gms.car#car\"'").getInputStreamLog().trim().equals("1")) {
+                                    "'SELECT 1 FROM Packages WHERE packageName=\"com.google.android.gms.car#car\"'").getInputStreamLog().equals("1")) {
 
                         appendText(logs, "\n\n--  run SQL method #1  --");
                         appendText(logs, runSuWithCmd(
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
                     } else if (runSuWithCmd(
                             path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'SELECT 1 FROM Packages WHERE packageName=\"com.google.android.gms.car\"'").getInputStreamLog().trim().equals("1")) {
+                                    "'SELECT 1 FROM Packages WHERE packageName=\"com.google.android.gms.car\"'").getInputStreamLog().equals("1")) {
 
                         appendText(logs, "\n\n--  run SQL method #2  --");
                         appendText(logs, runSuWithCmd(
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
                     } else if (runSuWithCmd(
                             path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'SELECT 1 FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car#car\"'").getInputStreamLog().trim().equals("1")) {
+                                    "'SELECT 1 FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car#car\"'").getInputStreamLog().equals("1")) {
 
                         appendText(logs, "\n\n--  run SQL method #3  --");
                         appendText(logs, runSuWithCmd(
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
                     } else if (runSuWithCmd(
                             path + "/sqlite3 /data/data/com.google.android.gms/databases/phenotype.db " +
-                                    "'SELECT 1 FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"'").getInputStreamLog().trim().equals("1")) {
+                                    "'SELECT 1 FROM ApplicationStates WHERE packageName=\"com.google.android.gms.car\"'").getInputStreamLog().equals("1")) {
 
                         appendText(logs, "\n\n--  run SQL method #4  --");
                         appendText(logs, runSuWithCmd(
